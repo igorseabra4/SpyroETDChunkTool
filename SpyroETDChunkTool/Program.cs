@@ -2,47 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SpyroETDExtractor
 {
-    public static class Extensions
-    {
-        public static bool isPS2 = false;
-
-        public static int Switch(this int a)
-        {
-            if (isPS2) return a;
-            return BitConverter.ToInt32(BitConverter.GetBytes(a).Reverse().ToArray(), 0);
-        }
-        public static uint Switch(this uint a)
-        {
-            if (isPS2) return a;
-            return BitConverter.ToUInt32(BitConverter.GetBytes(a).Reverse().ToArray(), 0);
-        }
-        public static short Switch(this short a)
-        {
-            if (isPS2) return a;
-            return BitConverter.ToInt16(BitConverter.GetBytes(a).Reverse().ToArray(), 0);
-        }
-        public static ushort Switch(this ushort a)
-        {
-            if (isPS2) return a;
-            return BitConverter.ToUInt16(BitConverter.GetBytes(a).Reverse().ToArray(), 0);
-        }
-        public static float Switch(this float a)
-        {
-            if (isPS2) return a;
-            return BitConverter.ToSingle(BitConverter.GetBytes(a).Reverse().ToArray(), 0);
-        }
-        public static byte Switch(this byte a)
-        {
-            return a;
-        }
-    }
-
     class Program
     {
         [STAThread]
@@ -65,81 +28,76 @@ namespace SpyroETDExtractor
                 foreach (string s in args)
                 {
                     Extract(s, out string outputFolder);
-                    Console.WriteLine("Done extracting " + Path.GetFileName(s) + " to " + outputFolder);
+                    Console.WriteLine("Done extracting " + s + " to " + outputFolder);
                 }
             }
             else
             {
-                ConsoleKey option = ConsoleKey.D4;
-
-                while (option != ConsoleKey.D0)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("Current console mode: " + (Extensions.isPS2 ? "Playstation 2" : "GameCube"));
-                    Console.WriteLine("What do you want to do?");
-                    Console.WriteLine("0 = exit");
-                    Console.WriteLine("1 = unpack CNK file");
-                    Console.WriteLine("2 = pack CNK file from folder");
-                    Console.WriteLine("3 = switch console mode to " + (Extensions.isPS2 ? "GameCube" : "Playstation 2"));
-
-                    option = Console.ReadKey().Key;
-                    Console.WriteLine();
-
-                    switch (option)
-                    {
-                        case ConsoleKey.D1:
-                            OpenFileDialog openFile = new OpenFileDialog()
-                            {
-                                Filter = "CNK Files|*.cnk",
-                                Multiselect = true
-                            };
-                            if (openFile.ShowDialog(new Form() { TopMost = true }) == DialogResult.OK)
-                            {
-                                foreach (string s in openFile.FileNames)
-                                {
-                                    Extract(s, out string outputFolder);
-                                    Console.WriteLine("Done extracting " + Path.GetFileName(s) + " to " + outputFolder);
-                                }
-                            }
-                            else
-                                Console.WriteLine("Operation cancelled.");
-                            break;
-                        case ConsoleKey.D2:
-                            FolderBrowserDialog openFolder = new FolderBrowserDialog();
-                            SaveFileDialog saveFile = new SaveFileDialog()
-                            {
-                                Filter = "CNK Files|*.cnk"
-                            };
-
-                            if (openFolder.ShowDialog(new Form() { TopMost = true }) == DialogResult.OK)
-                            {
-                                if (saveFile.ShowDialog(new Form() { TopMost = true }) == DialogResult.OK)
-                                {
-                                    Create(openFolder.SelectedPath, saveFile.FileName);
-                                    Console.WriteLine("Done creating " + Path.GetFileName(saveFile.FileName) + " from " + Path.GetFileName(openFolder.SelectedPath));
-                                }
-                                else
-                                    Console.WriteLine("Operation cancelled.");
-                            }
-                            else
-                                Console.WriteLine("Operation cancelled.");
-                            break;
-                        case ConsoleKey.D3:
-                            Extensions.isPS2 = !Extensions.isPS2;
-                            break;
-                    }
-                }
+                ShowNoArgsMenu();
             }
         }
 
-        public class FileEntry
+        private static void ShowNoArgsMenu()
         {
-            public uint Hash;
-            public uint Offset;
-            public uint Size;
-            public uint Null;
+            ConsoleKey option = ConsoleKey.D4;
 
-            public byte[] Data;
+            while (option != ConsoleKey.D0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Current console mode: " + (Extensions.isPS2 ? "Playstation 2" : "GameCube"));
+                Console.WriteLine("What do you want to do?");
+                Console.WriteLine("0 = exit");
+                Console.WriteLine("1 = unpack CNK file");
+                Console.WriteLine("2 = pack CNK file from folder");
+                Console.WriteLine("3 = switch console mode to " + (Extensions.isPS2 ? "GameCube" : "Playstation 2"));
+
+                option = Console.ReadKey().Key;
+                Console.WriteLine();
+
+                switch (option)
+                {
+                    case ConsoleKey.D1:
+                        OpenFileDialog openFile = new OpenFileDialog()
+                        {
+                            Filter = "CNK Files|*.cnk",
+                            Multiselect = true
+                        };
+                        if (openFile.ShowDialog(new Form() { TopMost = true }) == DialogResult.OK)
+                        {
+                            foreach (string s in openFile.FileNames)
+                            {
+                                Extract(s, out string outputFolder);
+                                Console.WriteLine("Done extracting " + s + " to " + outputFolder);
+                            }
+                        }
+                        else
+                            Console.WriteLine("Operation cancelled.");
+                        break;
+                    case ConsoleKey.D2:
+                        FolderBrowserDialog openFolder = new FolderBrowserDialog();
+                        SaveFileDialog saveFile = new SaveFileDialog()
+                        {
+                            Filter = "CNK Files|*.cnk"
+                        };
+
+                        if (openFolder.ShowDialog(new Form() { TopMost = true }) == DialogResult.OK)
+                        {
+                            if (saveFile.ShowDialog(new Form() { TopMost = true }) == DialogResult.OK)
+                            {
+                                Create(openFolder.SelectedPath, saveFile.FileName);
+                                Console.WriteLine("Done creating " + saveFile.FileName + " from " + openFolder.SelectedPath);
+                            }
+                            else
+                                Console.WriteLine("Operation cancelled.");
+                        }
+                        else
+                            Console.WriteLine("Operation cancelled.");
+                        break;
+                    case ConsoleKey.D3:
+                        Extensions.isPS2 = !Extensions.isPS2;
+                        break;
+                }
+            }
         }
 
         private static void Extract(string s, out string outputFolder)
@@ -158,7 +116,7 @@ namespace SpyroETDExtractor
                     Hash = binaryReader.ReadUInt32().Switch(),
                     Offset = binaryReader.ReadUInt32().Switch(),
                     Size = binaryReader.ReadUInt32().Switch(),
-                    Null = binaryReader.ReadUInt32().Switch()
+                    Unknown = binaryReader.ReadUInt32().Switch()
                 });
             }
 
@@ -188,7 +146,7 @@ namespace SpyroETDExtractor
                     Hash = Convert.ToUInt32(Path.GetFileName(s), 16),
                     Data = Data,
                     Size = (uint)Data.Length,
-                    Null = (uint)(Extensions.isPS2 ? 2 : 0x00020000)
+                    Unknown = (uint)(Extensions.isPS2 ? 2 : 0x00020000)
                 });
             }
 
@@ -217,7 +175,7 @@ namespace SpyroETDExtractor
                 binaryWriter.Write(file.Hash.Switch());
                 binaryWriter.Write(file.Offset.Switch());
                 binaryWriter.Write(file.Size.Switch());
-                binaryWriter.Write(file.Null.Switch());
+                binaryWriter.Write(file.Unknown.Switch());
             }
 
             binaryWriter.BaseStream.Position = headerLenght;
