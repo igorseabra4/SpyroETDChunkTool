@@ -1,4 +1,4 @@
-﻿namespace SpyroETDExtractor
+﻿namespace SpyroETDChunkTool
 {
     public class FileEntry
     {

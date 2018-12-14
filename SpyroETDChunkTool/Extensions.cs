@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace SpyroETDExtractor
+namespace SpyroETDChunkTool
 {
     public static class Extensions
     {

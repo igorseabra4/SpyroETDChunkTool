@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace SpyroETDExtractor
+namespace SpyroETDChunkTool
 {
     class Program
     {

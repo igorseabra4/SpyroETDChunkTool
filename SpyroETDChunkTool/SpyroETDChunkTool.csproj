@@ -7,7 +7,7 @@
     <ProjectGuid>{A2D00D88-CD3E-47E6-A925-977FEFD1D63C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>SpyroETDExtractor</RootNamespace>
-    <AssemblyName>SpyroETDExtractor</AssemblyName>
+    <AssemblyName>SpyroETDChunkTool</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
